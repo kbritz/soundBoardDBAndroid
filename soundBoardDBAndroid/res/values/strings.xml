@@ -4,5 +4,8 @@
     <string name="app_name">Dragon Ball Soundboard</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    
+     <string name="compani">Kbrtz Development \n kbrtz.com</string>
+    
 
 </resources>

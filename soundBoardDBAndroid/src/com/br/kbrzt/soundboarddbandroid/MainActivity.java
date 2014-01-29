@@ -1,7 +1,5 @@
 package com.br.kbrzt.soundboarddbandroid;
 
-import java.io.IOException;
-
 import android.app.Activity;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -15,7 +13,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 public class MainActivity extends Activity implements OnClickListener {
 
@@ -24,13 +21,12 @@ public class MainActivity extends Activity implements OnClickListener {
 	LinearLayout splashLayout;
 	String TAG = "SOUND_BOARD";
 	Handler handler = new Handler();
+	MediaPlayer audio;
+	OnCompletionListener completionListener;
 
 	private SoundPool soundPool;
 	private int soundIG1, soundIV1;
-	private int soundIM1;
 	private int soundIC1;
-	private int soundIV2;
-	private int soundIG2;
 	private int soundIV3;
 	private int soundIV4;
 	private int soundIV5;
@@ -43,9 +39,27 @@ public class MainActivity extends Activity implements OnClickListener {
 		setContentView(R.layout.activity_main);
 
 		splashLayout = (LinearLayout) findViewById(R.id.splash);
+		
+		audio = new MediaPlayer();
+
+		audio = MediaPlayer.create(this, R.raw.goku);
 
 		splashLayout.setVisibility(View.VISIBLE);
 
+		initButtons();
+		
+		audio.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+
+			@Override
+			public boolean onError(MediaPlayer mp, int what, int extra) {
+				mp.reset();
+				Log.d(TAG, "aconteceu um erro");
+				return false;
+			}
+		});
+		
+		audio.setOnCompletionListener(completionListener);
+		
 		initButtons();
 
 		final Runnable r = new Runnable() {
@@ -70,14 +84,16 @@ public class MainActivity extends Activity implements OnClickListener {
 		loadAudios();
 
 	}
+	
+	public void complete() {
+		audio.setOnCompletionListener(completionListener);
+	}
 
 	public void loadAudios() {
+		
 		soundIG1 = soundPool.load(this, R.raw.goku, 1);
 		soundIV1 = soundPool.load(this, R.raw.maldade, 1);
-		soundIM1 = soundPool.load(this, R.raw.comer, 1);
 		soundIC1 = soundPool.load(this, R.raw.maldicao, 1);
-		soundIV2 = soundPool.load(this, R.raw.oito_mil, 1);
-		soundIG2 = soundPool.load(this, R.raw.kamehameha, 1);
 		soundIV3 = soundPool.load(this, R.raw.verme_maldito, 1);
 		soundIV4 = soundPool.load(this, R.raw.verme_verde, 1);
 		soundIV5 = soundPool.load(this, R.raw.cafe, 1);
@@ -118,17 +134,62 @@ public class MainActivity extends Activity implements OnClickListener {
 		volume = actualVolume / maxVolume;
 
 	}
-
+	
 	@Override
 	protected void onStop() {
 		super.onStop();
+		soundPool.autoPause();
+		
+		if (audio != null) {
+			if (audio.isPlaying()) {
+				Log.d(TAG, "tem audio tocando! PARA!");
+				audio.stop();
+			}
+		}
 
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
+		soundPool.autoPause();
+		
+		if (audio == null)
+			audio = MediaPlayer.create(this, R.raw.goku);
 
+	}
+	
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		soundPool.autoPause();
+	}
+	
+	public MediaPlayer loadMediaPlayer(String audioName) {
+
+		if (audioName.equals("comer")) {
+			audio = MediaPlayer.create(this, R.raw.comer);
+		} else if (audioName.equals("kamehameha")) {
+			audio = MediaPlayer.create(this, R.raw.kamehameha);
+		} else {
+			audio = MediaPlayer.create(this, R.raw.oito_mil);
+		}
+
+		return audio;
+	}
+
+	public void playMediaPlayer(String audioName) {
+		
+		if (audio != null) {
+			if (!audio.isPlaying()) {
+				loadMediaPlayer(audioName).start();
+			} else {
+				Log.d(TAG, "JA TA TOCANDO");
+				audio.stop();
+				loadMediaPlayer(audioName).start();
+			}
+		}
 	}
 
 	@Override
@@ -139,6 +200,11 @@ public class MainActivity extends Activity implements OnClickListener {
 		switch (ids) {
 		case R.id.g1:
 			soundPool.autoPause();
+			if (audio != null) {
+				if (audio.isPlaying()) {
+					audio.stop();
+				}
+			}
 			if (loaded) {
 				soundPool.play(soundIG1, volume, volume, 1, 0, 1f);
 				Log.e("Test", "Played sound");
@@ -146,6 +212,11 @@ public class MainActivity extends Activity implements OnClickListener {
 			break;
 		case R.id.v1:
 			soundPool.autoPause();
+			if (audio != null) {
+				if (audio.isPlaying()) {
+					audio.stop();
+				}
+			}
 			if (loaded) {
 				soundPool.play(soundIV1, volume, volume, 1, 0, 1f);
 				Log.e("Test", "Played sound");
@@ -153,27 +224,23 @@ public class MainActivity extends Activity implements OnClickListener {
 			break;
 		case R.id.m1:
 			soundPool.autoPause();
-			if (loaded) {
-				soundPool.play(soundIM1, volume, volume, 1, 0, 1f);
-				Log.e("Test", "Played sound");
-			}
+			playMediaPlayer("comer");
 			break;
 		case R.id.g2:
 			soundPool.autoPause();
-			if (loaded) {
-				soundPool.play(soundIG2, volume, volume, 1, 0, 1f);
-				Log.e("Test", "Played sound");
-			}
+			playMediaPlayer("kamehameha");
 			break;
 		case R.id.v2:
 			soundPool.autoPause();
-			if (loaded) {
-				soundPool.play(soundIV2, volume, volume, 1, 0, 1f);
-				Log.e("Test", "Played sound");
-			}
+			playMediaPlayer("oito_mil");
 			break;
 		case R.id.c1:
 			soundPool.autoPause();
+			if (audio != null) {
+				if (audio.isPlaying()) {
+					audio.stop();
+				}
+			}
 			if (loaded) {
 				soundPool.play(soundIC1, volume, volume, 1, 0, 1f);
 				Log.e("Test", "Played sound");
@@ -181,6 +248,11 @@ public class MainActivity extends Activity implements OnClickListener {
 			break;
 		case R.id.v3:
 			soundPool.autoPause();
+			if (audio != null) {
+				if (audio.isPlaying()) {
+					audio.stop();
+				}
+			}
 			if (loaded) {
 				soundPool.play(soundIV3, volume, volume, 1, 0, 1f);
 				Log.e("Test", "Played sound");
@@ -188,6 +260,11 @@ public class MainActivity extends Activity implements OnClickListener {
 			break;
 		case R.id.v4:
 			soundPool.autoPause();
+			if (audio != null) {
+				if (audio.isPlaying()) {
+					audio.stop();
+				}
+			}
 			if (loaded) {
 				soundPool.play(soundIV4, volume, volume, 1, 0, 1f);
 				Log.e("Test", "Played sound");
@@ -195,6 +272,11 @@ public class MainActivity extends Activity implements OnClickListener {
 			break;
 		case R.id.v5:
 			soundPool.autoPause();
+			if (audio != null) {
+				if (audio.isPlaying()) {
+					audio.stop();
+				}
+			}
 			if (loaded) {
 				soundPool.play(soundIV5, volume, volume, 1, 0, 1f);
 				Log.e("Test", "Played sound");
@@ -206,11 +288,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		default:
 			break;
 		}
-	}
-
-	public void showToast() {
-		Toast.makeText(getApplicationContext(), "Aguarde momento",
-				Toast.LENGTH_LONG).show();
 	}
 
 }

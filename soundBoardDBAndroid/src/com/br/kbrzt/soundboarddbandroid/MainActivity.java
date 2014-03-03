@@ -15,7 +15,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+    
+    All images and sounds used in this applications belong to TOEI ANIMATION.
+
+Dragon Ball 2003 BIRD STUDIO/ SHUEISHA, TOEI ANIMATION. Licensed by FUNimation Productions,
+Ltd. All Rights Reserved. Dragon Ball and all logos, character names and distinctive likenesses 
+thereof are trademarks of TOEI ANIMATION.
+ */
 
 package com.br.kbrzt.soundboarddbandroid;
 
@@ -58,7 +64,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		setContentView(R.layout.activity_main);
 
 		splashLayout = (LinearLayout) findViewById(R.id.splash);
-		
+
 		audio = new MediaPlayer();
 
 		audio = MediaPlayer.create(this, R.raw.goku);
@@ -66,7 +72,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		splashLayout.setVisibility(View.VISIBLE);
 
 		initButtons();
-		
+
 		audio.setOnErrorListener(new MediaPlayer.OnErrorListener() {
 
 			@Override
@@ -76,9 +82,9 @@ public class MainActivity extends Activity implements OnClickListener {
 				return false;
 			}
 		});
-		
+
 		audio.setOnCompletionListener(completionListener);
-		
+
 		initButtons();
 
 		final Runnable r = new Runnable() {
@@ -103,13 +109,13 @@ public class MainActivity extends Activity implements OnClickListener {
 		loadAudios();
 
 	}
-	
+
 	public void complete() {
 		audio.setOnCompletionListener(completionListener);
 	}
 
 	public void loadAudios() {
-		
+
 		soundIG1 = soundPool.load(this, R.raw.goku, 1);
 		soundIV1 = soundPool.load(this, R.raw.maldade, 1);
 		soundIC1 = soundPool.load(this, R.raw.maldicao, 1);
@@ -153,12 +159,12 @@ public class MainActivity extends Activity implements OnClickListener {
 		volume = actualVolume / maxVolume;
 
 	}
-	
+
 	@Override
 	protected void onStop() {
 		super.onStop();
 		soundPool.autoPause();
-		
+
 		if (audio != null) {
 			if (audio.isPlaying()) {
 				Log.d(TAG, "tem audio tocando! PARA!");
@@ -172,19 +178,19 @@ public class MainActivity extends Activity implements OnClickListener {
 	protected void onResume() {
 		super.onResume();
 		soundPool.autoPause();
-		
+
 		if (audio == null)
 			audio = MediaPlayer.create(this, R.raw.goku);
 
 	}
-	
+
 	@Override
 	protected void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
 		soundPool.autoPause();
 	}
-	
+
 	public MediaPlayer loadMediaPlayer(String audioName) {
 
 		if (audioName.equals("comer")) {
@@ -199,7 +205,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	}
 
 	public void playMediaPlayer(String audioName) {
-		
+
 		if (audio != null) {
 			if (!audio.isPlaying()) {
 				loadMediaPlayer(audioName).start();

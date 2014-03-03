@@ -15,7 +15,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+    
+    All images and sounds used in this applications belong to TOEI ANIMATION.
+
+Dragon Ball 2003 BIRD STUDIO/ SHUEISHA, TOEI ANIMATION. Licensed by FUNimation Productions,
+Ltd. All Rights Reserved. Dragon Ball and all logos, character names and distinctive likenesses 
+thereof are trademarks of TOEI ANIMATION.
+ */
 
 package com.br.kbrzt.soundboarddbandroid;
 

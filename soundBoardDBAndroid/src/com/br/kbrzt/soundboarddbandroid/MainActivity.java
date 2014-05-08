@@ -25,6 +25,9 @@ thereof are trademarks of TOEI ANIMATION.
 
 package com.br.kbrzt.soundboarddbandroid;
 
+import java.util.Arrays;
+import java.util.List;
+
 import android.app.Activity;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -36,17 +39,22 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ImageButton;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 
+import com.br.kbrzt.soundboarddbandroid.enums.CaractersEnum;
 import com.purplebrain.adbuddiz.sdk.AdBuddiz;
 import com.purplebrain.adbuddiz.sdk.AdBuddizDelegate;
 import com.purplebrain.adbuddiz.sdk.AdBuddizError;
 
-public class MainActivity extends Activity implements OnClickListener, AdBuddizDelegate {
+public class MainActivity extends Activity implements OnClickListener,
+	AdBuddizDelegate {
 
-    ImageButton btn_g1, btn_v1, btn_m1, btn_g2, btn_v2, btn_c1, btn_v3, btn_v4,
-	    btn_v5;
+    Button btnAbout;
+
     LinearLayout splashLayout;
     String TAG = "SOUND_BOARD";
     Handler handler = new Handler();
@@ -59,15 +67,19 @@ public class MainActivity extends Activity implements OnClickListener, AdBuddizD
     private int soundIV3;
     private int soundIV4;
     private int soundIV5;
+    
+    private List<Integer> sound;
+    private GridView gridCaracters;
     boolean loaded = false;
     float volume;
     private boolean hasShownAdd = false;
     private AdBuddizDelegate delegate;
+    private GridObjectAdapter gridAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
-	setContentView(R.layout.activity_main);
+	setContentView(R.layout.new_activity_main);
 
 	splashLayout = (LinearLayout) findViewById(R.id.splash);
 
@@ -77,7 +89,7 @@ public class MainActivity extends Activity implements OnClickListener, AdBuddizD
 
 	splashLayout.setVisibility(View.VISIBLE);
 
-	initButtons();
+	initComponents();
 
 	audio.setOnErrorListener(new MediaPlayer.OnErrorListener() {
 
@@ -90,8 +102,6 @@ public class MainActivity extends Activity implements OnClickListener, AdBuddizD
 	});
 
 	audio.setOnCompletionListener(completionListener);
-
-	initButtons();
 
 	final Runnable r = new Runnable() {
 	    public void run() {
@@ -126,36 +136,35 @@ public class MainActivity extends Activity implements OnClickListener, AdBuddizD
     }
 
     public void loadAudios() {
+	
+	List<CaractersEnum> caracters = Arrays.asList(CaractersEnum.values());
+	
+	for (CaractersEnum carac : caracters) {
+	    if (carac.isInSoundPool()) {
+		sound.add(soundPool.load(this, carac.getSound(), 1));
+	    }
+	}
 
-	soundIG1 = soundPool.load(this, R.raw.goku, 1);
-	soundIV1 = soundPool.load(this, R.raw.maldade, 1);
-	soundIC1 = soundPool.load(this, R.raw.maldicao, 1);
-	soundIV3 = soundPool.load(this, R.raw.verme_maldito, 1);
-	soundIV4 = soundPool.load(this, R.raw.verme_verde, 1);
-	soundIV5 = soundPool.load(this, R.raw.cafe, 1);
+//	soundIG1 = soundPool.load(this, R.raw.goku, 1);
+//	soundIV1 = soundPool.load(this, R.raw.maldade, 1);
+//	soundIC1 = soundPool.load(this, R.raw.maldicao, 1);
+//	soundIV3 = soundPool.load(this, R.raw.verme_maldito, 1);
+//	soundIV4 = soundPool.load(this, R.raw.verme_verde, 1);
+//	soundIV5 = soundPool.load(this, R.raw.cafe, 1);
     }
 
-    public void initButtons() {
+    public void initComponents() {
 
-	btn_g1 = (ImageButton) findViewById(R.id.g1);
-	btn_v1 = (ImageButton) findViewById(R.id.v1);
-	btn_m1 = (ImageButton) findViewById(R.id.m1);
-	btn_g2 = (ImageButton) findViewById(R.id.g2);
-	btn_v2 = (ImageButton) findViewById(R.id.v2);
-	btn_c1 = (ImageButton) findViewById(R.id.c1);
-	btn_v3 = (ImageButton) findViewById(R.id.v3);
-	btn_v4 = (ImageButton) findViewById(R.id.v4);
-	btn_v5 = (ImageButton) findViewById(R.id.v5);
+	btnAbout = (Button) findViewById(R.id.btn_about);
+	btnAbout.setOnClickListener(this);
 
-	btn_g1.setOnClickListener(this);
-	btn_m1.setOnClickListener(this);
-	btn_v1.setOnClickListener(this);
-	btn_g2.setOnClickListener(this);
-	btn_c1.setOnClickListener(this);
-	btn_v2.setOnClickListener(this);
-	btn_v3.setOnClickListener(this);
-	btn_v4.setOnClickListener(this);
-	btn_v5.setOnClickListener(this);
+	gridCaracters = (GridView) findViewById(R.id.grid_caracters);
+	
+	gridAdapter = new GridObjectAdapter(this);
+	gridCaracters.setAdapter(gridAdapter);
+	gridAdapter.notifyDataSetChanged();
+	
+	gridCaracters.setOnItemClickListener(onGridItemClickListener);
 
 	splashLayout.setOnClickListener(this);
     }
@@ -170,6 +179,19 @@ public class MainActivity extends Activity implements OnClickListener, AdBuddizD
 	volume = actualVolume / maxVolume;
 
     }
+
+    private final OnItemClickListener onGridItemClickListener = new OnItemClickListener() {
+
+	@Override
+	public void onItemClick(final AdapterView<?> parent, final View view,
+		final int position, final long itemId) {
+	    
+	    Log.d("play audio", "OnItemClickListener");
+
+	    final CaractersEnum carac = gridAdapter.getItem(position);
+	    playAudio(carac);
+	}
+    };
 
     @Override
     protected void onStop() {
@@ -234,7 +256,7 @@ public class MainActivity extends Activity implements OnClickListener, AdBuddizD
 
 	setVolume();
 	switch (ids) {
-	case R.id.g1:
+	case R.id.btn_about:
 	    soundPool.autoPause();
 	    if (audio != null) {
 		if (audio.isPlaying()) {
@@ -329,28 +351,48 @@ public class MainActivity extends Activity implements OnClickListener, AdBuddizD
 	}
     }
 
+    private void playAudio(final CaractersEnum caracter) {
+
+	if (caracter.isInSoundPool()) {
+	    soundPool.autoPause();
+	    if (audio != null) {
+		if (audio.isPlaying()) {
+		    audio.stop();
+		}
+	    }
+	    if (loaded) {
+		soundPool.play(soundIV5, volume, volume, 1, 0, 1f);
+		Log.e("Test", "Played sound");
+	    }
+	    
+	} else {
+	    
+	}
+
+    }
+
     @Override
     public void didCacheAd() {
 	// TODO Auto-generated method stub
-	
+
     }
 
     @Override
     public void didClick() {
 	// TODO Auto-generated method stub
-	
+
     }
 
     @Override
     public void didFailToShowAd(AdBuddizError arg0) {
 	// TODO Auto-generated method stub
-	
+
     }
 
     @Override
     public void didHideAd() {
 	// TODO Auto-generated method stub
-	
+
     }
 
     @Override

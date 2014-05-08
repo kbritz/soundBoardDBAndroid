@@ -36,7 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/buttons_margin"
-            android:background="@drawable/image_selector_g1" />
+            android:background="@drawable/image_selector_goku" />
 
         <ImageButton
             android:id="@+id/v1"
@@ -44,14 +44,14 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/buttons_margin"
             android:layout_marginRight="@dimen/buttons_margin"
-            android:background="@drawable/image_selector_v1" />
+            android:background="@drawable/image_selector_maldade" />
 
         <ImageButton
             android:id="@+id/m1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="@dimen/buttons_margin"
-            android:background="@drawable/image_selector_m1" />
+            android:background="@drawable/image_selector_comer" />
     </LinearLayout>
 
     <LinearLayout
@@ -65,7 +65,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/buttons_margin"
-            android:background="@drawable/image_selector_c1" />
+            android:background="@drawable/image_selector_maldicao" />
 
         <ImageButton
             android:id="@+id/v2"
@@ -73,14 +73,14 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/buttons_margin"
             android:layout_marginRight="@dimen/buttons_margin"
-            android:background="@drawable/image_selector_v2" />
+            android:background="@drawable/image_selector_oito_mil" />
 
         <ImageButton
             android:id="@+id/g2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="@dimen/buttons_margin"
-            android:background="@drawable/image_selector_g2" />
+            android:background="@drawable/image_selector_kamehameha" />
     </LinearLayout>
 
     <LinearLayout
@@ -94,7 +94,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/buttons_margin"
-            android:background="@drawable/image_selector_v3" />
+            android:background="@drawable/image_selector_verme_maldito" />
 
         <ImageButton
             android:id="@+id/v4"
@@ -102,14 +102,14 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/buttons_margin"
             android:layout_marginRight="@dimen/buttons_margin"
-            android:background="@drawable/image_selector_v4" />
+            android:background="@drawable/image_selector_cafe" />
 
         <ImageButton
             android:id="@+id/v5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="@dimen/buttons_margin"
-            android:background="@drawable/image_selector_v5" />
+            android:background="@drawable/image_selector_verme_verde" />
     </LinearLayout>
 
 </LinearLayout>

@@ -39,280 +39,323 @@ import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
-public class MainActivity extends Activity implements OnClickListener {
+import com.purplebrain.adbuddiz.sdk.AdBuddiz;
+import com.purplebrain.adbuddiz.sdk.AdBuddizDelegate;
+import com.purplebrain.adbuddiz.sdk.AdBuddizError;
 
-	ImageButton btn_g1, btn_v1, btn_m1, btn_g2, btn_v2, btn_c1, btn_v3, btn_v4,
-			btn_v5;
-	LinearLayout splashLayout;
-	String TAG = "SOUND_BOARD";
-	Handler handler = new Handler();
-	MediaPlayer audio;
-	OnCompletionListener completionListener;
+public class MainActivity extends Activity implements OnClickListener, AdBuddizDelegate {
 
-	private SoundPool soundPool;
-	private int soundIG1, soundIV1;
-	private int soundIC1;
-	private int soundIV3;
-	private int soundIV4;
-	private int soundIV5;
-	boolean loaded = false;
-	float volume;
+    ImageButton btn_g1, btn_v1, btn_m1, btn_g2, btn_v2, btn_c1, btn_v3, btn_v4,
+	    btn_v5;
+    LinearLayout splashLayout;
+    String TAG = "SOUND_BOARD";
+    Handler handler = new Handler();
+    MediaPlayer audio;
+    OnCompletionListener completionListener;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+    private SoundPool soundPool;
+    private int soundIG1, soundIV1;
+    private int soundIC1;
+    private int soundIV3;
+    private int soundIV4;
+    private int soundIV5;
+    boolean loaded = false;
+    float volume;
+    private boolean hasShownAdd = false;
+    private AdBuddizDelegate delegate;
 
-		splashLayout = (LinearLayout) findViewById(R.id.splash);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+	super.onCreate(savedInstanceState);
+	setContentView(R.layout.activity_main);
 
-		audio = new MediaPlayer();
+	splashLayout = (LinearLayout) findViewById(R.id.splash);
 
-		audio = MediaPlayer.create(this, R.raw.goku);
+	audio = new MediaPlayer();
 
-		splashLayout.setVisibility(View.VISIBLE);
+	audio = MediaPlayer.create(this, R.raw.goku);
 
-		initButtons();
+	splashLayout.setVisibility(View.VISIBLE);
 
-		audio.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+	initButtons();
 
-			@Override
-			public boolean onError(MediaPlayer mp, int what, int extra) {
-				mp.reset();
-				Log.d(TAG, "aconteceu um erro");
-				return false;
-			}
-		});
+	audio.setOnErrorListener(new MediaPlayer.OnErrorListener() {
 
-		audio.setOnCompletionListener(completionListener);
+	    @Override
+	    public boolean onError(MediaPlayer mp, int what, int extra) {
+		mp.reset();
+		Log.d(TAG, "aconteceu um erro");
+		return false;
+	    }
+	});
 
-		initButtons();
+	audio.setOnCompletionListener(completionListener);
 
-		final Runnable r = new Runnable() {
-			public void run() {
-				splashLayout.setVisibility(View.GONE);
-			}
-		};
-		handler.postDelayed(r, 3000);
+	initButtons();
 
-		this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
-		// Load the sound
-		soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
+	final Runnable r = new Runnable() {
+	    public void run() {
+		splashLayout.setVisibility(View.GONE);
+	    }
+	};
+	handler.postDelayed(r, 3000);
 
-		soundPool.setOnLoadCompleteListener(new OnLoadCompleteListener() {
-			@Override
-			public void onLoadComplete(SoundPool soundPool, int sampleId,
-					int status) {
-				loaded = true;
-			}
-		});
+	this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+	// Load the sound
+	soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
 
-		loadAudios();
+	soundPool.setOnLoadCompleteListener(new OnLoadCompleteListener() {
+	    @Override
+	    public void onLoadComplete(SoundPool soundPool, int sampleId,
+		    int status) {
+		loaded = true;
+	    }
+	});
 
+	AdBuddiz.setPublisherKey("93152f5e-f83a-4e42-9fed-d428c5ca9355");
+	AdBuddiz.setTestModeActive();
+	AdBuddiz.setDelegate(delegate);
+	AdBuddiz.cacheAds(this); // this = current Activity
+
+	loadAudios();
+
+    }
+
+    public void complete() {
+	audio.setOnCompletionListener(completionListener);
+    }
+
+    public void loadAudios() {
+
+	soundIG1 = soundPool.load(this, R.raw.goku, 1);
+	soundIV1 = soundPool.load(this, R.raw.maldade, 1);
+	soundIC1 = soundPool.load(this, R.raw.maldicao, 1);
+	soundIV3 = soundPool.load(this, R.raw.verme_maldito, 1);
+	soundIV4 = soundPool.load(this, R.raw.verme_verde, 1);
+	soundIV5 = soundPool.load(this, R.raw.cafe, 1);
+    }
+
+    public void initButtons() {
+
+	btn_g1 = (ImageButton) findViewById(R.id.g1);
+	btn_v1 = (ImageButton) findViewById(R.id.v1);
+	btn_m1 = (ImageButton) findViewById(R.id.m1);
+	btn_g2 = (ImageButton) findViewById(R.id.g2);
+	btn_v2 = (ImageButton) findViewById(R.id.v2);
+	btn_c1 = (ImageButton) findViewById(R.id.c1);
+	btn_v3 = (ImageButton) findViewById(R.id.v3);
+	btn_v4 = (ImageButton) findViewById(R.id.v4);
+	btn_v5 = (ImageButton) findViewById(R.id.v5);
+
+	btn_g1.setOnClickListener(this);
+	btn_m1.setOnClickListener(this);
+	btn_v1.setOnClickListener(this);
+	btn_g2.setOnClickListener(this);
+	btn_c1.setOnClickListener(this);
+	btn_v2.setOnClickListener(this);
+	btn_v3.setOnClickListener(this);
+	btn_v4.setOnClickListener(this);
+	btn_v5.setOnClickListener(this);
+
+	splashLayout.setOnClickListener(this);
+    }
+
+    public void setVolume() {
+
+	AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+	float actualVolume = (float) audioManager
+		.getStreamVolume(AudioManager.STREAM_MUSIC);
+	float maxVolume = (float) audioManager
+		.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+	volume = actualVolume / maxVolume;
+
+    }
+
+    @Override
+    protected void onStop() {
+	super.onStop();
+	soundPool.autoPause();
+
+	if (audio != null) {
+	    if (audio.isPlaying()) {
+		Log.d(TAG, "tem audio tocando! PARA!");
+		audio.stop();
+	    }
 	}
 
-	public void complete() {
-		audio.setOnCompletionListener(completionListener);
+    }
+
+    @Override
+    protected void onResume() {
+	super.onResume();
+	soundPool.autoPause();
+
+	if (audio == null)
+	    audio = MediaPlayer.create(this, R.raw.goku);
+
+    }
+
+    @Override
+    protected void onPause() {
+	// TODO Auto-generated method stub
+	super.onPause();
+	soundPool.autoPause();
+    }
+
+    public MediaPlayer loadMediaPlayer(String audioName) {
+
+	if (audioName.equals("comer")) {
+	    audio = MediaPlayer.create(this, R.raw.comer);
+	} else if (audioName.equals("kamehameha")) {
+	    audio = MediaPlayer.create(this, R.raw.kamehameha);
+	} else {
+	    audio = MediaPlayer.create(this, R.raw.oito_mil);
 	}
 
-	public void loadAudios() {
+	return audio;
+    }
 
-		soundIG1 = soundPool.load(this, R.raw.goku, 1);
-		soundIV1 = soundPool.load(this, R.raw.maldade, 1);
-		soundIC1 = soundPool.load(this, R.raw.maldicao, 1);
-		soundIV3 = soundPool.load(this, R.raw.verme_maldito, 1);
-		soundIV4 = soundPool.load(this, R.raw.verme_verde, 1);
-		soundIV5 = soundPool.load(this, R.raw.cafe, 1);
+    public void playMediaPlayer(String audioName) {
+
+	if (audio != null) {
+	    if (!audio.isPlaying()) {
+		loadMediaPlayer(audioName).start();
+	    } else {
+		Log.d(TAG, "JA TA TOCANDO");
+		audio.stop();
+		loadMediaPlayer(audioName).start();
+	    }
 	}
+    }
 
-	public void initButtons() {
+    @Override
+    public void onClick(View v) {
+	int ids = v.getId();
 
-		btn_g1 = (ImageButton) findViewById(R.id.g1);
-		btn_v1 = (ImageButton) findViewById(R.id.v1);
-		btn_m1 = (ImageButton) findViewById(R.id.m1);
-		btn_g2 = (ImageButton) findViewById(R.id.g2);
-		btn_v2 = (ImageButton) findViewById(R.id.v2);
-		btn_c1 = (ImageButton) findViewById(R.id.c1);
-		btn_v3 = (ImageButton) findViewById(R.id.v3);
-		btn_v4 = (ImageButton) findViewById(R.id.v4);
-		btn_v5 = (ImageButton) findViewById(R.id.v5);
-
-		btn_g1.setOnClickListener(this);
-		btn_m1.setOnClickListener(this);
-		btn_v1.setOnClickListener(this);
-		btn_g2.setOnClickListener(this);
-		btn_c1.setOnClickListener(this);
-		btn_v2.setOnClickListener(this);
-		btn_v3.setOnClickListener(this);
-		btn_v4.setOnClickListener(this);
-		btn_v5.setOnClickListener(this);
-
-		splashLayout.setOnClickListener(this);
-	}
-
-	public void setVolume() {
-
-		AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-		float actualVolume = (float) audioManager
-				.getStreamVolume(AudioManager.STREAM_MUSIC);
-		float maxVolume = (float) audioManager
-				.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-		volume = actualVolume / maxVolume;
-
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
-		soundPool.autoPause();
-
-		if (audio != null) {
-			if (audio.isPlaying()) {
-				Log.d(TAG, "tem audio tocando! PARA!");
-				audio.stop();
-			}
+	setVolume();
+	switch (ids) {
+	case R.id.g1:
+	    soundPool.autoPause();
+	    if (audio != null) {
+		if (audio.isPlaying()) {
+		    audio.stop();
 		}
-
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		soundPool.autoPause();
-
-		if (audio == null)
-			audio = MediaPlayer.create(this, R.raw.goku);
-
-	}
-
-	@Override
-	protected void onPause() {
-		// TODO Auto-generated method stub
-		super.onPause();
-		soundPool.autoPause();
-	}
-
-	public MediaPlayer loadMediaPlayer(String audioName) {
-
-		if (audioName.equals("comer")) {
-			audio = MediaPlayer.create(this, R.raw.comer);
-		} else if (audioName.equals("kamehameha")) {
-			audio = MediaPlayer.create(this, R.raw.kamehameha);
-		} else {
-			audio = MediaPlayer.create(this, R.raw.oito_mil);
+	    }
+	    if (loaded) {
+		soundPool.play(soundIG1, volume, volume, 1, 0, 1f);
+		Log.e("Test", "Played sound");
+	    }
+	    break;
+	case R.id.v1:
+	    soundPool.autoPause();
+	    if (audio != null) {
+		if (audio.isPlaying()) {
+		    audio.stop();
 		}
-
-		return audio;
-	}
-
-	public void playMediaPlayer(String audioName) {
-
-		if (audio != null) {
-			if (!audio.isPlaying()) {
-				loadMediaPlayer(audioName).start();
-			} else {
-				Log.d(TAG, "JA TA TOCANDO");
-				audio.stop();
-				loadMediaPlayer(audioName).start();
-			}
+	    }
+	    if (loaded) {
+		soundPool.play(soundIV1, volume, volume, 1, 0, 1f);
+		Log.e("Test", "Played sound");
+	    }
+	    break;
+	case R.id.m1:
+	    soundPool.autoPause();
+	    if (!hasShownAdd) {
+		AdBuddiz.showAd(this);
+	    }
+	    playMediaPlayer("comer");
+	    break;
+	case R.id.g2:
+	    soundPool.autoPause();
+	    playMediaPlayer("kamehameha");
+	    break;
+	case R.id.v2:
+	    soundPool.autoPause();
+	    playMediaPlayer("oito_mil");
+	    break;
+	case R.id.c1:
+	    soundPool.autoPause();
+	    if (audio != null) {
+		if (audio.isPlaying()) {
+		    audio.stop();
 		}
-	}
-
-	@Override
-	public void onClick(View v) {
-		int ids = v.getId();
-
-		setVolume();
-		switch (ids) {
-		case R.id.g1:
-			soundPool.autoPause();
-			if (audio != null) {
-				if (audio.isPlaying()) {
-					audio.stop();
-				}
-			}
-			if (loaded) {
-				soundPool.play(soundIG1, volume, volume, 1, 0, 1f);
-				Log.e("Test", "Played sound");
-			}
-			break;
-		case R.id.v1:
-			soundPool.autoPause();
-			if (audio != null) {
-				if (audio.isPlaying()) {
-					audio.stop();
-				}
-			}
-			if (loaded) {
-				soundPool.play(soundIV1, volume, volume, 1, 0, 1f);
-				Log.e("Test", "Played sound");
-			}
-			break;
-		case R.id.m1:
-			soundPool.autoPause();
-			playMediaPlayer("comer");
-			break;
-		case R.id.g2:
-			soundPool.autoPause();
-			playMediaPlayer("kamehameha");
-			break;
-		case R.id.v2:
-			soundPool.autoPause();
-			playMediaPlayer("oito_mil");
-			break;
-		case R.id.c1:
-			soundPool.autoPause();
-			if (audio != null) {
-				if (audio.isPlaying()) {
-					audio.stop();
-				}
-			}
-			if (loaded) {
-				soundPool.play(soundIC1, volume, volume, 1, 0, 1f);
-				Log.e("Test", "Played sound");
-			}
-			break;
-		case R.id.v3:
-			soundPool.autoPause();
-			if (audio != null) {
-				if (audio.isPlaying()) {
-					audio.stop();
-				}
-			}
-			if (loaded) {
-				soundPool.play(soundIV3, volume, volume, 1, 0, 1f);
-				Log.e("Test", "Played sound");
-			}
-			break;
-		case R.id.v4:
-			soundPool.autoPause();
-			if (audio != null) {
-				if (audio.isPlaying()) {
-					audio.stop();
-				}
-			}
-			if (loaded) {
-				soundPool.play(soundIV4, volume, volume, 1, 0, 1f);
-				Log.e("Test", "Played sound");
-			}
-			break;
-		case R.id.v5:
-			soundPool.autoPause();
-			if (audio != null) {
-				if (audio.isPlaying()) {
-					audio.stop();
-				}
-			}
-			if (loaded) {
-				soundPool.play(soundIV5, volume, volume, 1, 0, 1f);
-				Log.e("Test", "Played sound");
-			}
-			break;
-		case R.id.splash:
-			splashLayout.setVisibility(View.GONE);
-			break;
-		default:
-			break;
+	    }
+	    if (loaded) {
+		soundPool.play(soundIC1, volume, volume, 1, 0, 1f);
+		Log.e("Test", "Played sound");
+	    }
+	    break;
+	case R.id.v3:
+	    soundPool.autoPause();
+	    if (audio != null) {
+		if (audio.isPlaying()) {
+		    audio.stop();
 		}
+	    }
+	    if (loaded) {
+		soundPool.play(soundIV3, volume, volume, 1, 0, 1f);
+		Log.e("Test", "Played sound");
+	    }
+	    break;
+	case R.id.v4:
+	    soundPool.autoPause();
+	    if (audio != null) {
+		if (audio.isPlaying()) {
+		    audio.stop();
+		}
+	    }
+	    if (loaded) {
+		soundPool.play(soundIV4, volume, volume, 1, 0, 1f);
+		Log.e("Test", "Played sound");
+	    }
+	    break;
+	case R.id.v5:
+	    soundPool.autoPause();
+	    if (audio != null) {
+		if (audio.isPlaying()) {
+		    audio.stop();
+		}
+	    }
+	    if (loaded) {
+		soundPool.play(soundIV5, volume, volume, 1, 0, 1f);
+		Log.e("Test", "Played sound");
+	    }
+	    break;
+	case R.id.splash:
+	    splashLayout.setVisibility(View.GONE);
+	    break;
+	default:
+	    break;
 	}
+    }
+
+    @Override
+    public void didCacheAd() {
+	// TODO Auto-generated method stub
+	
+    }
+
+    @Override
+    public void didClick() {
+	// TODO Auto-generated method stub
+	
+    }
+
+    @Override
+    public void didFailToShowAd(AdBuddizError arg0) {
+	// TODO Auto-generated method stub
+	
+    }
+
+    @Override
+    public void didHideAd() {
+	// TODO Auto-generated method stub
+	
+    }
+
+    @Override
+    public void didShowAd() {
+	hasShownAdd = true;
+    }
 
 }

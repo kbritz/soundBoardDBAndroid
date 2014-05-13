@@ -29,14 +29,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import android.app.Activity;
-import android.media.AudioManager;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
-import android.media.SoundPool;
-import android.media.SoundPool.OnLoadCompleteListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -48,356 +48,197 @@ import android.widget.LinearLayout;
 import com.br.kbrzt.soundboarddbandroid.enums.CaractersEnum;
 import com.purplebrain.adbuddiz.sdk.AdBuddiz;
 import com.purplebrain.adbuddiz.sdk.AdBuddizDelegate;
-import com.purplebrain.adbuddiz.sdk.AdBuddizError;
 
-public class MainActivity extends Activity implements OnClickListener,
-	AdBuddizDelegate {
+public class MainActivity extends Activity implements OnClickListener {
 
-    Button btnAbout;
+	Button btnAbout;
 
-    LinearLayout splashLayout;
-    String TAG = "SOUND_BOARD";
-    Handler handler = new Handler();
-    MediaPlayer audio;
-    OnCompletionListener completionListener;
+	LinearLayout splashLayout;
+	String TAG = "SOUND_BOARD";
+	Handler handler = new Handler();
+	MediaPlayer audio;
+	OnCompletionListener completionListener;
 
-    private SoundPool soundPool;
-    private int soundIG1, soundIV1;
-    private int soundIC1;
-    private int soundIV3;
-    private int soundIV4;
-    private int soundIV5;
-    
-    private List<Integer> sound;
-    private GridView gridCaracters;
-    boolean loaded = false;
-    float volume;
-    private boolean hasShownAdd = false;
-    private AdBuddizDelegate delegate;
-    private GridObjectAdapter gridAdapter;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-	super.onCreate(savedInstanceState);
-	setContentView(R.layout.new_activity_main);
-
-	splashLayout = (LinearLayout) findViewById(R.id.splash);
-
-	audio = new MediaPlayer();
-
-	audio = MediaPlayer.create(this, R.raw.goku);
-
-	splashLayout.setVisibility(View.VISIBLE);
-
-	initComponents();
-
-	audio.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-
-	    @Override
-	    public boolean onError(MediaPlayer mp, int what, int extra) {
-		mp.reset();
-		Log.d(TAG, "aconteceu um erro");
-		return false;
-	    }
-	});
-
-	audio.setOnCompletionListener(completionListener);
-
-	final Runnable r = new Runnable() {
-	    public void run() {
-		splashLayout.setVisibility(View.GONE);
-	    }
-	};
-	handler.postDelayed(r, 3000);
-
-	this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
-	// Load the sound
-	soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
-
-	soundPool.setOnLoadCompleteListener(new OnLoadCompleteListener() {
-	    @Override
-	    public void onLoadComplete(SoundPool soundPool, int sampleId,
-		    int status) {
-		loaded = true;
-	    }
-	});
-
-	AdBuddiz.setPublisherKey("93152f5e-f83a-4e42-9fed-d428c5ca9355");
-	AdBuddiz.setTestModeActive();
-	AdBuddiz.setDelegate(delegate);
-	AdBuddiz.cacheAds(this); // this = current Activity
-
-	loadAudios();
-
-    }
-
-    public void complete() {
-	audio.setOnCompletionListener(completionListener);
-    }
-
-    public void loadAudios() {
-	
-	List<CaractersEnum> caracters = Arrays.asList(CaractersEnum.values());
-	
-	for (CaractersEnum carac : caracters) {
-	    if (carac.isInSoundPool()) {
-		sound.add(soundPool.load(this, carac.getSound(), 1));
-	    }
-	}
-
-//	soundIG1 = soundPool.load(this, R.raw.goku, 1);
-//	soundIV1 = soundPool.load(this, R.raw.maldade, 1);
-//	soundIC1 = soundPool.load(this, R.raw.maldicao, 1);
-//	soundIV3 = soundPool.load(this, R.raw.verme_maldito, 1);
-//	soundIV4 = soundPool.load(this, R.raw.verme_verde, 1);
-//	soundIV5 = soundPool.load(this, R.raw.cafe, 1);
-    }
-
-    public void initComponents() {
-
-	btnAbout = (Button) findViewById(R.id.btn_about);
-	btnAbout.setOnClickListener(this);
-
-	gridCaracters = (GridView) findViewById(R.id.grid_caracters);
-	
-	gridAdapter = new GridObjectAdapter(this);
-	gridCaracters.setAdapter(gridAdapter);
-	gridAdapter.notifyDataSetChanged();
-	
-	gridCaracters.setOnItemClickListener(onGridItemClickListener);
-
-	splashLayout.setOnClickListener(this);
-    }
-
-    public void setVolume() {
-
-	AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-	float actualVolume = (float) audioManager
-		.getStreamVolume(AudioManager.STREAM_MUSIC);
-	float maxVolume = (float) audioManager
-		.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-	volume = actualVolume / maxVolume;
-
-    }
-
-    private final OnItemClickListener onGridItemClickListener = new OnItemClickListener() {
+	private GridView gridCaracters;
+	boolean loaded = false;
+	private boolean hasShownAd = false;
+	private int adCount = 0;
+	private AdBuddizDelegate delegate;
+	private GridObjectAdapter gridAdapter;
+	List<CaractersEnum> caracters;
+	LinearLayout aboutLayout;
 
 	@Override
-	public void onItemClick(final AdapterView<?> parent, final View view,
-		final int position, final long itemId) {
-	    
-	    Log.d("play audio", "OnItemClickListener");
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
 
-	    final CaractersEnum carac = gridAdapter.getItem(position);
-	    playAudio(carac);
-	}
-    };
+		splashLayout = (LinearLayout) findViewById(R.id.splash);
 
-    @Override
-    protected void onStop() {
-	super.onStop();
-	soundPool.autoPause();
+		audio = new MediaPlayer();
 
-	if (audio != null) {
-	    if (audio.isPlaying()) {
-		Log.d(TAG, "tem audio tocando! PARA!");
-		audio.stop();
-	    }
-	}
+		audio = MediaPlayer.create(this, R.raw.goku);
 
-    }
+		splashLayout.setVisibility(View.VISIBLE);
 
-    @Override
-    protected void onResume() {
-	super.onResume();
-	soundPool.autoPause();
+		initComponents();
 
-	if (audio == null)
-	    audio = MediaPlayer.create(this, R.raw.goku);
+		audio.setOnErrorListener(new MediaPlayer.OnErrorListener() {
 
-    }
+			@Override
+			public boolean onError(MediaPlayer mp, int what, int extra) {
+				mp.reset();
+				return false;
+			}
+		});
 
-    @Override
-    protected void onPause() {
-	// TODO Auto-generated method stub
-	super.onPause();
-	soundPool.autoPause();
-    }
+		audio.setOnCompletionListener(completionListener);
 
-    public MediaPlayer loadMediaPlayer(String audioName) {
+		final Runnable r = new Runnable() {
+			public void run() {
+				splashLayout.setVisibility(View.GONE);
+			}
+		};
+		handler.postDelayed(r, 3000);
 
-	if (audioName.equals("comer")) {
-	    audio = MediaPlayer.create(this, R.raw.comer);
-	} else if (audioName.equals("kamehameha")) {
-	    audio = MediaPlayer.create(this, R.raw.kamehameha);
-	} else {
-	    audio = MediaPlayer.create(this, R.raw.oito_mil);
+		AdBuddiz.setPublisherKey(Constants.adKey);
+		AdBuddiz.setTestModeActive();
+		AdBuddiz.cacheAds(this); // this = current Activity
+
+		caracters = Arrays.asList(CaractersEnum.values());
+
 	}
 
-	return audio;
-    }
-
-    public void playMediaPlayer(String audioName) {
-
-	if (audio != null) {
-	    if (!audio.isPlaying()) {
-		loadMediaPlayer(audioName).start();
-	    } else {
-		Log.d(TAG, "JA TA TOCANDO");
-		audio.stop();
-		loadMediaPlayer(audioName).start();
-	    }
-	}
-    }
-
-    @Override
-    public void onClick(View v) {
-	int ids = v.getId();
-
-	setVolume();
-	switch (ids) {
-	case R.id.btn_about:
-	    soundPool.autoPause();
-	    if (audio != null) {
-		if (audio.isPlaying()) {
-		    audio.stop();
-		}
-	    }
-	    if (loaded) {
-		soundPool.play(soundIG1, volume, volume, 1, 0, 1f);
-		Log.e("Test", "Played sound");
-	    }
-	    break;
-	case R.id.v1:
-	    soundPool.autoPause();
-	    if (audio != null) {
-		if (audio.isPlaying()) {
-		    audio.stop();
-		}
-	    }
-	    if (loaded) {
-		soundPool.play(soundIV1, volume, volume, 1, 0, 1f);
-		Log.e("Test", "Played sound");
-	    }
-	    break;
-	case R.id.m1:
-	    soundPool.autoPause();
-	    if (!hasShownAdd) {
-		AdBuddiz.showAd(this);
-	    }
-	    playMediaPlayer("comer");
-	    break;
-	case R.id.g2:
-	    soundPool.autoPause();
-	    playMediaPlayer("kamehameha");
-	    break;
-	case R.id.v2:
-	    soundPool.autoPause();
-	    playMediaPlayer("oito_mil");
-	    break;
-	case R.id.c1:
-	    soundPool.autoPause();
-	    if (audio != null) {
-		if (audio.isPlaying()) {
-		    audio.stop();
-		}
-	    }
-	    if (loaded) {
-		soundPool.play(soundIC1, volume, volume, 1, 0, 1f);
-		Log.e("Test", "Played sound");
-	    }
-	    break;
-	case R.id.v3:
-	    soundPool.autoPause();
-	    if (audio != null) {
-		if (audio.isPlaying()) {
-		    audio.stop();
-		}
-	    }
-	    if (loaded) {
-		soundPool.play(soundIV3, volume, volume, 1, 0, 1f);
-		Log.e("Test", "Played sound");
-	    }
-	    break;
-	case R.id.v4:
-	    soundPool.autoPause();
-	    if (audio != null) {
-		if (audio.isPlaying()) {
-		    audio.stop();
-		}
-	    }
-	    if (loaded) {
-		soundPool.play(soundIV4, volume, volume, 1, 0, 1f);
-		Log.e("Test", "Played sound");
-	    }
-	    break;
-	case R.id.v5:
-	    soundPool.autoPause();
-	    if (audio != null) {
-		if (audio.isPlaying()) {
-		    audio.stop();
-		}
-	    }
-	    if (loaded) {
-		soundPool.play(soundIV5, volume, volume, 1, 0, 1f);
-		Log.e("Test", "Played sound");
-	    }
-	    break;
-	case R.id.splash:
-	    splashLayout.setVisibility(View.GONE);
-	    break;
-	default:
-	    break;
-	}
-    }
-
-    private void playAudio(final CaractersEnum caracter) {
-
-	if (caracter.isInSoundPool()) {
-	    soundPool.autoPause();
-	    if (audio != null) {
-		if (audio.isPlaying()) {
-		    audio.stop();
-		}
-	    }
-	    if (loaded) {
-		soundPool.play(soundIV5, volume, volume, 1, 0, 1f);
-		Log.e("Test", "Played sound");
-	    }
-	    
-	} else {
-	    
+	public void complete() {
+		audio.setOnCompletionListener(completionListener);
 	}
 
-    }
+	public void initComponents() {
 
-    @Override
-    public void didCacheAd() {
-	// TODO Auto-generated method stub
+		btnAbout = (Button) findViewById(R.id.btn_about);
+		btnAbout.setOnClickListener(this);
 
-    }
+		gridCaracters = (GridView) findViewById(R.id.grid_caracters);
 
-    @Override
-    public void didClick() {
-	// TODO Auto-generated method stub
+		gridAdapter = new GridObjectAdapter(this);
+		gridCaracters.setAdapter(gridAdapter);
+		gridAdapter.notifyDataSetChanged();
 
-    }
+		gridCaracters.setOnItemClickListener(onGridItemClickListener);
 
-    @Override
-    public void didFailToShowAd(AdBuddizError arg0) {
-	// TODO Auto-generated method stub
+		aboutLayout = (LinearLayout) findViewById(R.id.about_linear);
 
-    }
+		splashLayout.setOnClickListener(this);
 
-    @Override
-    public void didHideAd() {
-	// TODO Auto-generated method stub
+		btnAbout.setOnClickListener(this);
+	}
 
-    }
+	private final OnItemClickListener onGridItemClickListener = new OnItemClickListener() {
 
-    @Override
-    public void didShowAd() {
-	hasShownAdd = true;
-    }
+		@Override
+		public void onItemClick(final AdapterView<?> parent, final View view,
+				final int position, final long itemId) {
+
+			final CaractersEnum carac = gridAdapter.getItem(position);
+			playAudio(carac);
+
+			adCount++;
+
+			Log.d(TAG, "CLICA: " + adCount);
+			showAd();
+		}
+	};
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		stopAudio();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (audio == null)
+			audio = MediaPlayer.create(this, R.raw.goku);
+
+	}
+
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		stopAudio();
+	}
+
+	@Override
+	public void onClick(View v) {
+		int ids = v.getId();
+		switch (ids) {
+		case R.id.btn_about:
+			openAbout();
+			break;
+		case R.id.splash:
+			splashLayout.setVisibility(View.GONE);
+			break;
+		default:
+			break;
+		}
+	}
+
+	private void openAbout() {
+
+		Log.d(TAG, "openAbout");
+		
+		AlertDialog dialog;
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		// Add the buttons
+		
+		LayoutInflater inflater = this.getLayoutInflater();
+		
+		builder.setView(inflater.inflate(R.layout.popup_about, null));
+		builder.setNegativeButton(R.string.exit,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						if (dialog != null)
+							dialog.dismiss();
+					}
+				});
+		
+		builder.setTitle(R.string.btn_about);
+
+		// Create the AlertDialog
+		dialog = builder.create();
+
+		dialog.show();
+
+	}
+
+	private void playAudio(final CaractersEnum caracter) {
+		stopAudio();
+		audio = MediaPlayer.create(this, caracter.getSound());
+		audio.start();
+	}
+
+	public void stopAudio() {
+		if (audio != null) {
+			if (audio.isPlaying()) {
+				Log.d(TAG, "tem audio tocando! PARA!");
+				audio.stop();
+				audio.release();
+				audio = null;
+			}
+		}
+	}
+
+	public void showAd() {
+
+		Log.d(TAG, "showAd: " + adCount);
+		if (adCount >= 8 && !hasShownAd) {
+			hasShownAd = true;
+			adCount = 0;
+			AdBuddiz.showAd(this);
+		}
+	}
 
 }

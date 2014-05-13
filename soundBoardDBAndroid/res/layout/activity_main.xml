@@ -16,100 +16,40 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
             android:gravity="center"
             android:text="@string/compani"
             android:textColor="#ffffff"
-            android:textSize="15sp"
-            android:layout_gravity="center"
-            android:layout_marginTop="15dp" />
-
+            android:textSize="15sp" />
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
-        android:orientation="horizontal" >
+    <GridView
+        android:id="@+id/grid_caracters"
+        android:layout_width="match_parent"
+        android:layout_height="430dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="50dp"
+        android:gravity="center"
+        android:horizontalSpacing="10dp"
+        android:listSelector="@android:color/transparent"
+        android:numColumns="3"
+        android:verticalSpacing="10dp" >
+    </GridView>
 
-        <ImageButton
-            android:id="@+id/g1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/buttons_margin"
-            android:background="@drawable/image_selector_goku" />
-
-        <ImageButton
-            android:id="@+id/v1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/buttons_margin"
-            android:layout_marginRight="@dimen/buttons_margin"
-            android:background="@drawable/image_selector_maldade" />
-
-        <ImageButton
-            android:id="@+id/m1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/buttons_margin"
-            android:background="@drawable/image_selector_comer" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/layouts_margin"
-        android:orientation="horizontal" >
-
-        <ImageButton
-            android:id="@+id/c1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/buttons_margin"
-            android:background="@drawable/image_selector_maldicao" />
-
-        <ImageButton
-            android:id="@+id/v2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/buttons_margin"
-            android:layout_marginRight="@dimen/buttons_margin"
-            android:background="@drawable/image_selector_oito_mil" />
-
-        <ImageButton
-            android:id="@+id/g2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/buttons_margin"
-            android:background="@drawable/image_selector_kamehameha" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/layouts_margin"
-        android:orientation="horizontal" >
-
-        <ImageButton
-            android:id="@+id/v3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/buttons_margin"
-            android:background="@drawable/image_selector_verme_maldito" />
-
-        <ImageButton
-            android:id="@+id/v4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/buttons_margin"
-            android:layout_marginRight="@dimen/buttons_margin"
-            android:background="@drawable/image_selector_cafe" />
-
-        <ImageButton
-            android:id="@+id/v5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/buttons_margin"
-            android:background="@drawable/image_selector_verme_verde" />
-    </LinearLayout>
+    <Button
+        android:id="@+id/btn_about"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:layout_gravity="right"
+        android:layout_marginBottom="15dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/about_button_selector"
+        android:text="@string/btn_about"
+        android:textColor="@android:color/white"
+        android:visibility="visible" />
 
 </LinearLayout>

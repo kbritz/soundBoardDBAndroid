@@ -102,7 +102,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		handler.postDelayed(r, 3000);
 
 		AdBuddiz.setPublisherKey(Constants.adKey);
-		AdBuddiz.setTestModeActive();
 		AdBuddiz.cacheAds(this); // this = current Activity
 
 		caracters = Arrays.asList(CaractersEnum.values());

@@ -4,5 +4,15 @@
     <string name="app_name">Dragon Ball Soundboard</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="compani">Kbrtz Development \n kbrtz.com</string>
+    <string name="btn_about">About</string>
+    <string name="app_rights">         All images and sounds are property of TOEI ANIMATION.
+Dragon Ball © 2003 BIRD STUDIO / Shueisha, Toei Animation
+TOEI ANIMATION is not responsible for this application.
+If you need, contact us via:
+- Kbrtz.com
+- Kbrtzdevelopment@gmail.com </string>
+    <string name="exit">Close</string>
+    <string name="app_description"> Dragon soundboard is an app that has the only propose to entertain and help users to go back to their childhood listening some of the voices of our favorites characters from the dragon ball’s cartoons.</string>
 
 </resources>

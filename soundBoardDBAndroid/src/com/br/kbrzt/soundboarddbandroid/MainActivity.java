@@ -27,6 +27,7 @@ package com.br.kbrzt.soundboarddbandroid;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -67,6 +68,8 @@ public class MainActivity extends Activity implements OnClickListener {
 	private GridObjectAdapter gridAdapter;
 	List<CaractersEnum> caracters;
 	LinearLayout aboutLayout;
+	
+	String locale;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +108,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		AdBuddiz.cacheAds(this); // this = current Activity
 
 		caracters = Arrays.asList(CaractersEnum.values());
-
+		
+		locale = Locale.getDefault().getDisplayLanguage();
 	}
 
 	public void complete() {
